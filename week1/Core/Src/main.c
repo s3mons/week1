@@ -125,30 +125,100 @@ int main(void)
 
 	  //6//
 	  // button
-	  static GPIO_PinState B1State[2] = {0};
-	  static uint32_t TimeDelay = 500; // ms
-  	  B1State[0]= HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13); // read B1 (PC13)
-  	  if(B1State[1] == GPIO_PIN_SET && B1State[0] == GPIO_PIN_RESET) //falling edge
-  	  {
-  		  if(TimeDelay == 500)
-  		  {
-  			  TimeDelay = 1000;
-  		  }
-  		  else
-  		  {
-  			  TimeDelay = 500;
-  		  }
+//	  static GPIO_PinState B1State[2] = {0};
+//	  static uint32_t TimeDelay = 500; // ms
+//  	  B1State[0]= HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13); // read B1 (PC13)
+//  	  if(B1State[1] == GPIO_PIN_SET && B1State[0] == GPIO_PIN_RESET) //falling edge
+//  	  {
+//  		  if(TimeDelay == 500)
+//  		  {
+//  			  TimeDelay = 1000;
+//  		  }
+//  		  else
+//  		  {
+//  			  TimeDelay = 500;
+//  		  }
+//
+//  	  }
+//  	  B1State[1] = B1State[0];
+//
+//  	  //LED
+//  	  static uint32_t timeStamp = 0;
+//	  if( HAL_GetTick() - timeStamp >= TimeDelay)
+//	  {
+//		  timeStamp = HAL_GetTick();
+//		  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+//	  }
 
-  	  }
-  	  B1State[1] = B1State[0];
+	  // Exercise //
+	  // 1 //
+//	  static GPIO_PinState S1[2] = {0};
+//	  static uint32_t TimeDelay[4] = {250, 500, 1000, 1500};
+//	  static int c = 3;
+//	  S1[0] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10); // switch S1 (PA10)
+//	  if(S1[0] == GPIO_PIN_RESET && S1[1] == GPIO_PIN_SET) // falling edge
+//	  {
+//		  c+=1;
+//	  }
+//	  S1[1] = S1[0];
+//
+//	  static uint32_t timeStamp = 0;
+//
+//	  if( HAL_GetTick() - timeStamp >= TimeDelay[c%4])
+//  	  {
+//  		  timeStamp = HAL_GetTick();
+//  		  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9); // LED D1 (PA9)
+//  	  }
 
-  	  //LED
-  	  static uint32_t timeStamp = 0;
-	  if( HAL_GetTick() - timeStamp >= TimeDelay)
+	  // 2 //
+
+//	  static GPIO_PinState S1[2] = {0};
+//	  static uint32_t TimeDelay[2] = {0, 1000};
+//	  static int c = 1;
+//	  S1[0] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10); // switch S1 (PA10)
+//	  if(S1[0] == GPIO_PIN_RESET && S1[1] == GPIO_PIN_SET) // falling edge
+//	  {
+//		  c+=1;
+//	  }
+//	  S1[1] = S1[0];
+//
+//	  static uint32_t timeStamp = 0;
+//
+//	  if( HAL_GetTick() - timeStamp >= TimeDelay[c%2])
+//		  {
+//			  timeStamp = HAL_GetTick();
+//			  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9); // LED D1 (PA9)
+//		  }
+
+	  // 3 //
+
+	  static GPIO_PinState S1[2] = {0};
+	  static uint32_t TimeDelay[2] = {500, 1500};
+	  static int c = 1;
+	  S1[0] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10); // switch S1 (PA10)
+	  if(S1[0] == GPIO_PIN_RESET && S1[1] == GPIO_PIN_SET) // falling edge
+	  {
+		  c+=1;
+	  }
+	  S1[1] = S1[0];
+
+	  static uint32_t timeStamp = 0;
+
+	  if( HAL_GetTick() - timeStamp <= TimeDelay[c%2])
+	  {
+		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET); // LED D1 (PA9)
+	  }
+	  else if( HAL_GetTick() - timeStamp >= TimeDelay[c%2] && HAL_GetTick() - timeStamp <= 2000)
+	  {
+		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET); // LED D1 (PA9)
+	  }
+	  else
 	  {
 		  timeStamp = HAL_GetTick();
-		  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 	  }
+
+
+
 
 
     /* USER CODE END WHILE */
@@ -251,7 +321,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LD2_Pin|D1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -259,12 +329,18 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LD2_Pin */
-  GPIO_InitStruct.Pin = LD2_Pin;
+  /*Configure GPIO pins : LD2_Pin D1_Pin */
+  GPIO_InitStruct.Pin = LD2_Pin|D1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : S1_Pin */
+  GPIO_InitStruct.Pin = S1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(S1_GPIO_Port, &GPIO_InitStruct);
 
 }
 
